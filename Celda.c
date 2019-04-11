@@ -1,8 +1,10 @@
-#include <stdio.h>
-
-struct celda
+typedef struct celda
   {
-      int int_member;
-      double double_member;
-      char string_member[25];
-  };
+      char tipo;
+      bool arriba;
+      bool abajo;
+      bool der;
+      bool izq;
+      char* color;
+
+  }Celda;

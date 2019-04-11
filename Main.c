@@ -1,32 +1,48 @@
-#include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <pthread.h>
+#include <unistd.h>
 #include "Matriz.c"
 
 
-//Caracteres adentro del archivo
+//GLOBALES****************************
+
 char caracter;
-int largo; //i
-int alto;//j
+int largo; //j
+int alto;//i
 
+//************************************
 
-void leerArchivo(char file[]){
+void *Impresor(void *x){
+    while(flag){
+        printMatriz();
+        usleep(3);
+        system("clear");
+    }
+    return NULL;
+}
+bool leerArchivo(char *nombre){
     FILE *archivo;
 	
     int i = 0;
     char matrizsize [5];
     char *largoStr = malloc(2 * sizeof(char));
     char *altoStr = malloc(2 * sizeof(char));
-    archivo = fopen("Mapas/m1.txt","r");
+    
+    //APERTURA DEL ARCHIVO****************************
+    char file[25] = "Mapas/";
+    strcat(file, nombre);
+    archivo = fopen(file,"r");
     if (archivo == NULL)
         {
-            printf("\nError de apertura del archivo. \n\n");
+            return false;
             
         }
         else
         {
-            printf("\nEl tamaño de la matriz es \n\n");
+            //printf("\nEl tamaño de la matriz es \n\n");
 
 
             while((caracter = fgetc(archivo)) != '\n') //Leer la primera linea
@@ -41,43 +57,47 @@ void leerArchivo(char file[]){
             largo = atoi(largoStr);
             alto = atoi(altoStr);
 
-
-            printf("\n");
-            printf("%s%d","Largo: ",largo);
-            printf("\n");
-            printf("%s%d","Alto: ",alto);
-            i=0;
-            
-            printf("\n");
             //crea una matriz de nxn
             Crearmatriz(alto,largo);
-            //inserta a en todos los campos de la matriz 
-            InsertarMatriz();
-            //imprime la matriz 
-            printMatriz();
 
-            
-            printf("\n");
-            printf("\nLa matriz es \n\n");
+            char *caracteres;
+            caracteres= (char*)malloc((alto*largo)*sizeof(char));
+            i=0;
             while((caracter = fgetc(archivo)) != EOF)
 	        {
-                //if(caracter != '\n'){
-                    //printf("%d%s%c\n", i," : ",caracter);
-                    //i = i+1;
-	    	        printf("%c",caracter);
-                //}
+                if(caracter!='\n'){
+                    caracteres[i]=caracter;
+                    i++;
+                }
                                 
 	        }
-            printf("\n");
+            i=0;
+
+            //inserta a en todos los campos de la matriz
+            InsertarMatriz(caracteres);
+            free(caracteres);
         }
         fclose(archivo);
+        return true;
 }
 int main()
 {
     printf("%s","Ingresar el nombre del archivo: ");
     char archivo[15];
     scanf("%s",archivo);
-    printf("%s%s","Procesando el archivo: ",archivo);
-    leerArchivo(archivo);
+    //printf("%s%s","Procesando el archivo: ",archivo);
+    system("clear");
+    bool abierto = leerArchivo(archivo);
+    
+    if(abierto){
+        //HILO IMPRESOR*****************************
+        pthread_t print;
+        int x=0;
+        pthread_create(&print, NULL, Impresor, &x);
+        //******************************************
+        
+        Mover('d',0,0);
+    }
+
    return 0;
 }
