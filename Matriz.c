@@ -109,4 +109,9 @@ void printMatriz(){
     }
 }
 
+bool check(int i , int j){
+    printf("%c",matriz[i][j].tipo);
+    return false;
+}
+
 //*******************************************************
