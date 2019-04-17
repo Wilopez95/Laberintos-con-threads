@@ -1,3 +1,4 @@
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,7 +10,7 @@ char caracter;
 int largo; //j
 int alto;//i
 
-
+//************************************
 bool leerArchivo(char *nombre){
     FILE *archivo;
 	
@@ -55,6 +56,7 @@ bool leerArchivo(char *nombre){
                 if(caracter!='\n'){
                     caracteres[i]=caracter;
                     i++;
+                    //printf("%c",caracter);
                 }
                                 
 	        }

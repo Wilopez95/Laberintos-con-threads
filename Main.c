@@ -8,128 +8,6 @@
 #include "Leerarchivo.c"
 
 
-//************************************
-
-void *Impresor(void *x){
-    while(flag){
-        printMatriz();
-        usleep(3);
-        system("clear");
-    }
-    return NULL;
-}
-
-void *moveUp(void *x){
-
-}
-
-void *moveDown(void *x){
-     for(int i = 0; i < g_alto; i++)
-    {
-        for(int j = 0; j < g_largo; j++)
-        {
-           printf("%c",matriz[i][j].tipo);
-           fflush ( stdout ) ;
-           usleep (1000000) ;
-        }
-        printf("\n");
-    }
-
-}
-
-void *moveLeft(void *x){
-
-}
-
-void *moveRigth(void *x){
-
-}
-
-bool cheekup(int i, int j){
-    if(i== 0){
-        printf("%s","No se puede ir para arriba");
-        printf("\n");
-        return false;
-    }else{
-        if(matriz[i-1][j].tipo=='*' || matriz[i-1][j].arriba){
-            printf("%s","No se puede ir para arriba");
-            printf("\n");
-            return false;
-        }
-
-    }
-    printf("%s","Se puede ir para arriba");
-    printf("\n");
-    return true;
-    
-}
-
-bool cheekdown(int i, int j){
-    if(i== g_alto-1){
-        printf("%s","No se puede ir para abajo");
-        printf("\n");
-        return false;
-    }else{
-        if(matriz[i+1][j].tipo=='*' || matriz[i+1][j].abajo){
-            printf("%s","No se puede ir para abajo");
-            printf("\n");
-            return false;
-        }
-
-    }
-    printf("%s","Se puede ir para abajo");
-    printf("\n");
-    return true;
-    
-}
-
-bool cheekrigth(int i, int j){
-    if(j== g_largo-1){
-        printf("%s","No se puede ir para la derecha");
-        printf("\n");
-        return false;
-    }else{
-        if(matriz[i][j+1].tipo=='*' || matriz[i][j+1].der){
-            printf("%s","No se puede ir para la derecha");
-            printf("\n");
-            return false;
-        }
-
-    }
-    printf("%s","Se puede ir para la derecha");
-    printf("\n");
-    return true;
-    
-}
-
-bool cheekleft(int i, int j){
-    if(j== 0){
-        printf("%s","No se puede ir para la izquierda");
-        printf("\n");
-        return false;
-    }else{
-        if(matriz[i][j-1].tipo=='*' || matriz[i][j-1].izq){
-            printf("%s","No se puede ir para la izquierda");
-            printf("\n");
-            return false;
-        }
-
-    }
-    printf("%s","Se puede ir para la derecha");
-    printf("\n");
-    return true;
-    
-}
-
-
-void run (int i, int j){
-    cheekup(i,j);
-    cheekdown(i,j);
-    cheekrigth(i,j);
-        
-    
-
-}
 
 int main()
 {
@@ -138,19 +16,66 @@ int main()
     scanf("%s",archivo);
     //printf("%s%s","Procesando el archivo: ",archivo);
     system("clear");
+    int stat;
+
     bool abierto = leerArchivo(archivo);
-    
-    if(abierto){
-        //HILO IMPRESOR*****************************
-        //pthread_t print;
-        //int x=0;
-        //pthread_create(&print, NULL, moveDown, &x);
-        //pthread_join ( print , NULL ) ;
-        //******************************************
-        
-        //Mover('d',0,0);
-        run(9,0);
+
+    if (pthread_mutex_init(&lock, NULL) != 0)
+    {
+        printf("\n mutex init failed\n");
+        return 1;
     }
+
+    if(abierto){
+        pthread_t u, l, d, r;
+
+        Hilo hilou = {0,0,0,colores[5]};
+
+        stat = pthread_create(&(tid[Tid]), NULL, MoverD, &hilou);
+        if ( 0 != stat ) {
+ 	    // Error al crear el thread, salimos del padre lanzando signal o exit
+            exit(-1);
+        }
+
+        stat = pthread_join(tid[Tid], NULL);
+        if ( 0 != stat ) {
+	// Error al cerrar el thread, salimos del padre lanzando signal o exit
+            exit(-1);
+        }
+
+        Tid++;
+
+        /*Hilo hilol = {2,0,4,9,colores[3]};
+
+        stat = pthread_create(&l, NULL, MoverL, &hilol);
+        if ( 0 != stat ) {
+ 	    // Error al crear el thread, salimos del padre lanzando signal o exit
+            exit(-1);
+        }
+
+        stat = pthread_join(l, NULL);
+        if ( 0 != stat ) {
+	// Error al cerrar el thread, salimos del padre lanzando signal o exit
+            exit(-1);
+        }
+
+        Hilo hilor = {3,0,6,0,colores[4]};
+
+        stat = pthread_create(&r, NULL, MoverR, &hilor);
+        if ( 0 != stat ) {
+ 	    // Error al crear el thread, salimos del padre lanzando signal o exit
+            exit(-1);
+        }
+
+        stat = pthread_join(r, NULL);
+        if ( 0 != stat ) {
+	// Error al cerrar el thread, salimos del padre lanzando signal o exit
+            exit(-1);
+        }*/
+        
+    }
+
+     pthread_mutex_destroy(&lock);
 
    return 0;
 }
