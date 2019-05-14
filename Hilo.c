@@ -1,6 +1,7 @@
 typedef struct hilo{
+    int id;
     int pasos;
     int i;
     int j;
-    char* color;
+    int color;
 }Hilo;

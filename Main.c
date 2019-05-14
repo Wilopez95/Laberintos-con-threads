@@ -5,10 +5,85 @@
 #include <pthread.h>
 #include <unistd.h>
 #include "Matriz.c"
-#include "Leerarchivo.c"
 
 
+//GLOBALES****************************
 
+char caracter;
+int largo; //j
+int alto;//i
+
+//************************************
+bool leerArchivo(char *nombre){
+    FILE *archivo;
+	
+    int i = 0;
+    char matrizsize [5];
+    char *largoStr = malloc(2 * sizeof(char));
+    char *altoStr = malloc(2 * sizeof(char));
+    
+    //APERTURA DEL ARCHIVO****************************
+    char file[25] = "Mapas/";
+    strcat(file, nombre);
+    archivo = fopen(file,"r");
+    if (archivo == NULL)
+        {
+            return false;
+            
+        }
+        else
+        {
+            //printf("\nEl tamaño de la matriz es \n\n");
+
+
+            while((caracter = fgetc(archivo)) != '\n') //Leer la primera linea
+            {
+                
+                matrizsize[i]=caracter;
+                i++;
+            }
+
+            memcpy(largoStr, matrizsize, 2 * sizeof(char));
+            memcpy(altoStr, matrizsize + 3, 2 * sizeof(char));
+            largo = atoi(largoStr);
+            alto = atoi(altoStr);
+
+            //crea una matriz de nxn
+            Crearmatriz(alto,largo);
+
+            char *caracteres;
+            caracteres= (char*)malloc((alto*largo)*sizeof(char));
+            i=0;
+            while((caracter = fgetc(archivo)) != EOF)
+	        {
+                if(caracter!='\n' ){ 
+                    if(i<=alto*largo){
+                        caracteres[i]=caracter;
+                        i++;
+                    }
+
+                    else {
+                        printf("¡Tamaño dado inadecuado!\n");
+                        return false;
+                    }
+                }
+                                
+	        }
+
+            if(i<alto*largo){
+                printf("¡Tamaño dado inadecuado!\n");
+                return false;
+            }
+
+            i=0;
+
+            //inserta a en todos los campos de la matriz
+            InsertarMatriz(caracteres);
+            free(caracteres);
+        }
+        fclose(archivo);
+        return true;
+}
 int main()
 {
     printf("%s","Ingresar el nombre del archivo: ");
@@ -27,53 +102,52 @@ int main()
     }
 
     if(abierto){
-        pthread_t u, l, d, r;
 
-        Hilo hilou = {0,0,0,colores[5]};
+        Hilo hilod = {Tid,-1,0,0,0};
 
-        stat = pthread_create(&(tid[Tid]), NULL, MoverD, &hilou);
+        stat = pthread_create(&(tid[Tid]), NULL, MoverD, &hilod);
         if ( 0 != stat ) {
  	    // Error al crear el thread, salimos del padre lanzando signal o exit
-            exit(-1);
-        }
-
-        stat = pthread_join(tid[Tid], NULL);
-        if ( 0 != stat ) {
-	// Error al cerrar el thread, salimos del padre lanzando signal o exit
             exit(-1);
         }
 
         Tid++;
 
-        /*Hilo hilol = {2,0,4,9,colores[3]};
-
-        stat = pthread_create(&l, NULL, MoverL, &hilol);
-        if ( 0 != stat ) {
- 	    // Error al crear el thread, salimos del padre lanzando signal o exit
-            exit(-1);
+        while(flag){
+            ImpresorT();
         }
 
-        stat = pthread_join(l, NULL);
-        if ( 0 != stat ) {
-	// Error al cerrar el thread, salimos del padre lanzando signal o exit
-            exit(-1);
+        system("clear");
+        printMatriz();
+
+        printf("\n\n");
+
+        printf("ID : PASOS");
+        printf("\n");
+
+        for(int i = 0; i < Hid; i++)
+        {
+            if(hilos[i].id<10){
+                if(hilos[i].pasos>=10){
+                    printf("%s%c%d%s%d%s", colores[hilos[i].color], '0', hilos[i].id, " : ", hilos[i].pasos, ANSI_COLOR_RESET);
+                }
+                else
+                {
+                    printf("%s%c%d%s%c%d%s", colores[hilos[i].color], '0', hilos[i].id, " : ", '0', hilos[i].pasos, ANSI_COLOR_RESET);
+                }
+                
+            }
+            else{
+                printf("%s%d%s%d%s", colores[hilos[i].color], hilos[i].id, " : ", hilos[i].pasos, ANSI_COLOR_RESET);
+            }
+
+            if(i==Hid-1) printf("%s%s%s", colores[hilos[i].color], " ¡SALIDA!", ANSI_COLOR_RESET);
+
+            printf("\n");
+                
         }
 
-        Hilo hilor = {3,0,6,0,colores[4]};
-
-        stat = pthread_create(&r, NULL, MoverR, &hilor);
-        if ( 0 != stat ) {
- 	    // Error al crear el thread, salimos del padre lanzando signal o exit
-            exit(-1);
-        }
-
-        stat = pthread_join(r, NULL);
-        if ( 0 != stat ) {
-	// Error al cerrar el thread, salimos del padre lanzando signal o exit
-            exit(-1);
-        }*/
-        
-    }
+    }   
 
      pthread_mutex_destroy(&lock);
 
